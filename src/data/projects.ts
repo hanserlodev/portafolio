@@ -48,7 +48,7 @@ export const projects: Project[] = [
     tone: 'ember',
     tags: ['Next.js', 'TypeScript', 'NASA FIRMS', 'Datos geoespaciales'],
     github: `${GITHUB}/ninacal`,
-    demo: 'https://ninacal.vercel.app',
+    demo: 'https://ninacal.earth',
     featured: true,
     year: '2026',
     updatedAt: '2026-11-21',
