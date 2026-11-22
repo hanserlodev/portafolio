@@ -1,107 +1,96 @@
 import { notFound } from 'next/navigation';
-import { projects } from '@/data/projects';
-import Image from 'next/image';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Github, ExternalLink, Calendar } from 'lucide-react';
-import { Metadata } from 'next';
+import { ArrowLeft, Github, ExternalLink, Lock } from 'lucide-react';
+import ProjectVisual from '@/components/ProjectVisual';
+import { getProjectById, projects } from '@/data/projects';
 
 interface ProjectPageProps {
-  params: Promise<{
-    id: string;
-  }>;
+  params: Promise<{ id: string }>;
 }
 
-// Genera metadatos dinámicos para SEO
 export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
   const { id } = await params;
-  const project = projects.find((p) => p.id === id);
+  const project = getProjectById(id);
 
-  if (!project) {
-    return {
-      title: 'Proyecto no encontrado',
-    };
-  }
+  if (!project) return { title: 'Proyecto no encontrado' };
 
   return {
     title: project.title,
     description: project.description,
+    alternates: { canonical: `/projects/${project.id}` },
     openGraph: {
       title: project.title,
       description: project.description,
-      images: [project.image],
+      images: project.image ? [project.image] : ['/og-image.png'],
       type: 'article',
     },
   };
 }
 
-// Genera rutas estáticas para todos los proyectos
 export async function generateStaticParams() {
-  return projects.map((project) => ({
-    id: project.id,
-  }));
+  return projects.map((project) => ({ id: project.id }));
 }
 
 export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   const { id } = await params;
-  const project = projects.find((p) => p.id === id);
+  const project = getProjectById(id);
+  if (!project) notFound();
 
-  if (!project) {
-    notFound();
-  }
+  const index = projects.findIndex((item) => item.id === project.id);
+  const previous = index > 0 ? projects[index - 1] : null;
+  const next = index < projects.length - 1 ? projects[index + 1] : null;
 
   return (
     <div className="py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Botón volver */}
+      <article className="mx-auto max-w-4xl">
         <Link
           href="/projects"
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8"
+          className="mb-8 inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-primary"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={20} aria-hidden="true" />
           Volver a proyectos
         </Link>
 
-        {/* Badge de destacado */}
-        {project.featured && (
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-            ⭐ Proyecto Destacado
-          </div>
-        )}
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          {project.featured && (
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+              ⭐ Proyecto Destacado
+            </span>
+          )}
+          {project.confidential && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-sm font-medium text-muted-foreground">
+              <Lock size={14} aria-hidden="true" />
+              Proyecto privado · trabajo
+            </span>
+          )}
+          <span className="rounded-full bg-secondary px-3 py-1 text-sm font-medium text-muted-foreground">
+            {project.year}
+          </span>
+        </div>
 
-        {/* Título */}
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          {project.title}
-        </h1>
+        <h1 className="mb-4 text-4xl font-bold md:text-5xl">{project.title}</h1>
+        <p className="mb-8 text-xl text-muted-foreground">{project.description}</p>
 
-        {/* Descripción breve */}
-        <p className="text-xl text-muted-foreground mb-8">
-          {project.description}
-        </p>
-
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div className="mb-8 flex flex-wrap gap-2">
           {project.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-4 py-2 bg-secondary text-sm font-medium rounded-full"
-            >
+            <span key={tag} className="rounded-full bg-secondary px-4 py-2 text-sm font-medium">
               {tag}
             </span>
           ))}
         </div>
 
-        {/* Enlaces */}
-        <div className="flex flex-wrap gap-4 mb-12">
+        <div className="mb-12 flex flex-wrap gap-4">
           {project.github && (
             <a
               href={project.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-secondary hover:bg-accent rounded-lg font-medium transition-colors"
+              className="inline-flex items-center gap-2 rounded-lg bg-secondary px-6 py-3 font-medium transition-colors hover:bg-accent"
             >
-              <Github size={20} />
+              <Github size={20} aria-hidden="true" />
               Ver código
             </a>
           )}
@@ -110,93 +99,70 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
               href={project.demo}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-all"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-primary-foreground transition-all hover:opacity-90"
             >
-              <ExternalLink size={20} />
+              <ExternalLink size={20} aria-hidden="true" />
               Ver demo en vivo
             </a>
           )}
+          {project.confidential && (
+            <p className="self-center text-sm text-muted-foreground">
+              El código no está disponible públicamente.
+            </p>
+          )}
         </div>
 
-        {/* Imagen principal */}
-        <div className="relative w-full h-96 rounded-xl overflow-hidden mb-12 border border-border">
-          <Image
-            src={project.image}
-            alt={project.title}
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
+        <ProjectVisual
+          project={project}
+          className="mb-12 h-72 w-full rounded-xl border border-border md:h-96"
+          sizes="(max-width: 768px) 100vw, 896px"
+          priority
+        />
 
-        {/* Descripción larga */}
         {project.longDescription && (
-          <div className="prose prose-neutral dark:prose-invert max-w-none">
-            <h2 className="text-2xl font-bold mb-4">Sobre este proyecto</h2>
-            <p className="text-muted-foreground leading-relaxed">
+          <div className="max-w-none">
+            <h2 className="mb-4 text-2xl font-bold">Sobre este proyecto</h2>
+            <p className="leading-relaxed text-muted-foreground">
               {project.longDescription}
             </p>
           </div>
         )}
 
-        {/* Características (si quieres agregar más detalles) */}
-        <div className="mt-12 p-6 bg-secondary rounded-xl">
-          <h3 className="text-xl font-bold mb-4">Tecnologías utilizadas</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="mt-12 rounded-xl bg-secondary p-6">
+          <h3 className="mb-4 text-xl font-bold">Tecnologías utilizadas</h3>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             {project.tags.map((tag) => (
-              <div
-                key={tag}
-                className="flex items-center gap-2 text-muted-foreground"
-              >
-                <span className="text-primary">▸</span>
+              <div key={tag} className="flex items-center gap-2 text-muted-foreground">
+                <span className="text-primary" aria-hidden="true">▸</span>
                 {tag}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Navegación entre proyectos */}
-        <div className="mt-12 pt-8 border-t border-border">
-          <div className="flex justify-between items-center">
-            {getPreviousProject(project.id) && (
-              <Link
-                href={`/projects/${getPreviousProject(project.id)?.id}`}
-                className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-              >
-                <ArrowLeft
-                  size={20}
-                  className="group-hover:-translate-x-1 transition-transform"
-                />
-                <span>Proyecto anterior</span>
-              </Link>
-            )}
-            <div className="flex-1" />
-            {getNextProject(project.id) && (
-              <Link
-                href={`/projects/${getNextProject(project.id)?.id}`}
-                className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-              >
-                <span>Siguiente proyecto</span>
-                <ArrowLeft
-                  size={20}
-                  className="rotate-180 group-hover:translate-x-1 transition-transform"
-                />
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
+        <nav className="mt-12 flex items-center justify-between border-t border-border pt-8" aria-label="Navegación entre proyectos">
+          {previous ? (
+            <Link
+              href={`/projects/${previous.id}`}
+              className="group inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-primary"
+            >
+              <ArrowLeft size={20} className="transition-transform group-hover:-translate-x-1" aria-hidden="true" />
+              <span>{previous.title}</span>
+            </Link>
+          ) : (
+            <span />
+          )}
+          {next && (
+            <Link
+              href={`/projects/${next.id}`}
+              className="group inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-primary"
+            >
+              <span>{next.title}</span>
+              <ArrowLeft size={20} className="rotate-180 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+            </Link>
+          )}
+        </nav>
+      </article>
     </div>
   );
-}
-
-// Helpers para navegación entre proyectos
-function getPreviousProject(currentId: string) {
-  const currentIndex = projects.findIndex((p) => p.id === currentId);
-  return currentIndex > 0 ? projects[currentIndex - 1] : null;
-}
-
-function getNextProject(currentId: string) {
-  const currentIndex = projects.findIndex((p) => p.id === currentId);
-  return currentIndex < projects.length - 1 ? projects[currentIndex + 1] : null;
 }

@@ -1,4 +1,4 @@
-# Portfolio Project - Next.js 15 + TypeScript
+# Portfolio Project - Next.js 16 + TypeScript
 
 - [x] Create project structure
 - [x] Setup configuration files
@@ -7,7 +7,7 @@
 - [x] Ready to run development server
 
 ## Project Details
-- Framework: Next.js 15 (App Router)
+- Framework: Next.js 16 (App Router + Turbopack)
 - Language: TypeScript
 - Styling: TailwindCSS
 - Animation: Framer Motion

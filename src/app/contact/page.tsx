@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,7 +9,7 @@ import SectionTitle from '@/components/SectionTitle';
 import SocialLinks from '@/components/SocialLinks';
 import { personalInfo } from '@/data/personal';
 import { Mail, MapPin, Send, CheckCircle2 } from 'lucide-react';
-import emailjs from 'emailjs-com';
+import emailjs from '@emailjs/browser';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
@@ -33,41 +33,47 @@ export default function ContactPage() {
     resolver: zodResolver(contactSchema),
   });
 
+  // Oculta el mensaje de éxito automáticamente tras 5 segundos.
+  // El cleanup del timeout se gestiona aquí para evitar memory leaks.
+  useEffect(() => {
+    if (!isSuccess) return;
+    const timeoutId = setTimeout(() => setIsSuccess(false), 5000);
+    return () => clearTimeout(timeoutId);
+  }, [isSuccess]);
+
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     setError(null);
 
-    try {
-      // Verifica si las credenciales de EmailJS están configuradas
-      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
-      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+    // Verifica si las credenciales de EmailJS están configuradas
+    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 
-      if (serviceId && templateId && publicKey) {
-        // Envío real con EmailJS
-        await emailjs.send(
-          serviceId,
-          templateId,
-          {
-            from_name: data.name,
-            from_email: data.email,
-            message: data.message,
-            to_email: personalInfo.email,
-          },
-          publicKey
-        );
-      } else {
-        // Simulación de envío si no hay credenciales configuradas
-        console.warn('⚠️ EmailJS no configurado. Configura las variables de entorno en .env.local');
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-      }
+    // Si falta configuración, avisa en lugar de simular un envío exitoso
+    if (!serviceId || !templateId || !publicKey) {
+      setError(
+        `El formulario aún no está configurado. Escríbeme directamente a ${personalInfo.email}.`
+      );
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          from_name: data.name,
+          from_email: data.email,
+          message: data.message,
+          to_email: personalInfo.email,
+        },
+        publicKey
+      );
 
       setIsSuccess(true);
       reset();
-
-      // Reset success message after 5 seconds con cleanup
-      const timeoutId = setTimeout(() => setIsSuccess(false), 5000);
-      return () => clearTimeout(timeoutId);
     } catch (err) {
       const errorMessage = err instanceof Error 
         ? `Error: ${err.message}` 

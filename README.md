@@ -1,8 +1,8 @@
-# 🚀 Portafolio Profesional - Next.js 15
+# 🚀 Portafolio Profesional - Next.js 16
 
-Un portafolio moderno, limpio y completamente personalizable construido con Next.js 15, TypeScript, TailwindCSS y Framer Motion.
+Un portafolio moderno, limpio y completamente personalizable construido con Next.js 16, TypeScript, TailwindCSS y Framer Motion.
 
-![Next.js](https://img.shields.io/badge/Next.js-15-black)
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -12,7 +12,7 @@ Un portafolio moderno, limpio y completamente personalizable construido con Next
 - 🎨 **Diseño Moderno y Minimalista** - Interfaz limpia con animaciones suaves
 - 🌓 **Modo Oscuro/Claro** - Cambio de tema con persistencia
 - 📱 **Totalmente Responsive** - Optimizado para todos los dispositivos
-- ⚡ **Rendimiento Óptimo** - Next.js 15 con App Router
+- ⚡ **Rendimiento Óptimo** - Next.js 16 con App Router y Turbopack
 - 🎭 **Animaciones Fluidas** - Framer Motion para transiciones elegantes
 - 📊 **Gestión de Datos Modular** - Edita proyectos desde archivos TypeScript
 - 🔍 **SEO Optimizado** - Metadatos configurables
@@ -22,7 +22,7 @@ Un portafolio moderno, limpio y completamente personalizable construido con Next
 
 ## 🛠️ Tech Stack
 
-- **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
+- **Framework:** [Next.js 16](https://nextjs.org/) (App Router)
 - **Lenguaje:** [TypeScript](https://www.typescriptlang.org/)
 - **Estilos:** [TailwindCSS](https://tailwindcss.com/)
 - **Animaciones:** [Framer Motion](https://www.framer.com/motion/)
@@ -120,22 +120,15 @@ Coloca tu foto en `public/images/avatar.jpg` y actualiza la ruta en `personal.ts
 
 ### 4. Configurar EmailJS (opcional)
 
-1. Regístrate en [EmailJS](https://www.emailjs.com/)
-2. Crea un servicio y plantilla
-3. Edita `src/app/contact/page.tsx` y agrega tus credenciales:
+1. Regístrate en [EmailJS](https://www.emailjs.com/) y crea un servicio y una plantilla
+2. Copia `.env.example` a `.env.local` y rellena las tres variables `NEXT_PUBLIC_EMAILJS_*`
+3. Las credenciales **no** se editan en el código. Si faltan, el formulario muestra tu email directo en lugar de simular un envío
 
-```typescript
-await emailjs.send(
-  'YOUR_SERVICE_ID',
-  'YOUR_TEMPLATE_ID',
-  {
-    from_name: data.name,
-    from_email: data.email,
-    message: data.message,
-  },
-  'YOUR_PUBLIC_KEY'
-);
+```bash
+cp .env.example .env.local
 ```
+
+También configura `NEXT_PUBLIC_SITE_URL` con el dominio real: alimenta metadatos, canonical, `robots.txt` y `sitemap.xml`.
 
 ### 5. Ejecutar en desarrollo
 
@@ -181,11 +174,17 @@ Edita las animaciones de Framer Motion en los componentes:
 ## 📦 Scripts Disponibles
 
 ```bash
-npm run dev      # Inicia el servidor de desarrollo
-npm run build    # Construye para producción
-npm run start    # Inicia el servidor de producción
-npm run lint     # Ejecuta el linter
+npm run dev             # Inicia el servidor de desarrollo
+npm run build           # Construye para producción
+npm run start           # Inicia el servidor de producción
+npm run lint            # Ejecuta ESLint
+npm run lint:fix        # Corrige problemas de lint automáticamente
+npm run typecheck       # Verifica los tipos de TypeScript
+npm run typecheck:strict # Verificación de tipos con reglas estrictas (opcional)
+npm run verify          # lint + typecheck + build, en ese orden
 ```
+
+El flujo de CI (`.github/workflows/ci.yml`) ejecuta `npm ci` → `lint` → `typecheck` → `build` con Node 20 en pushes y PRs a `main`.
 
 ## 🚀 Deploy en Vercel
 
@@ -198,8 +197,9 @@ npm run lint     # Ejecuta el linter
 
 ## 🎯 Características Pendientes
 
+- [x] Página de cada proyecto individual
+- [x] SEO (sitemap, robots, Open Graph y Twitter Cards)
 - [ ] Blog con MDX
-- [ ] Página de cada proyecto individual
 - [ ] Modo multilenguaje (i18n)
 - [ ] Integración con CMS (Sanity/Contentful)
 - [ ] Analytics
@@ -231,12 +231,12 @@ Este portafolio fue diseñado para ser:
 
 Si tienes preguntas o necesitas ayuda:
 
-- 📧 Email: tuemail@ejemplo.com
-- 🐦 Twitter: [@tuusuario](https://twitter.com/tuusuario)
-- 💼 LinkedIn: [Tu Perfil](https://linkedin.com/in/tuusuario)
+- 📧 Email: hanserlodev@gmail.com
+- 🐦 Twitter: [@hanserlodev](https://twitter.com/hanserlodev)
+- 💼 LinkedIn: [Hans Ordoñez](https://www.linkedin.com/in/hans-anderson-ordo%C3%B1ez-molinero-699a19381/)
 
 ---
 
 ⭐ Si este proyecto te fue útil, considera darle una estrella en GitHub!
 
-**Hecho con ❤️ usando Next.js 15**
+**Hecho con ❤️ usando Next.js 16**

@@ -1,10 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Github, ExternalLink } from 'lucide-react';
-import { Project } from '@/data/projects';
+import ProjectVisual from '@/components/ProjectVisual';
+import type { Project } from '@/data/projects';
 
 interface ProjectCardProps {
   project: Project;
@@ -12,56 +12,51 @@ interface ProjectCardProps {
 }
 
 /**
- * Tarjeta individual de proyecto.
- * 
- * Muestra:
- * - Imagen del proyecto con efecto hover
- * - Título y descripción
- * - Tags de tecnologías (máximo 4 visibles)
- * - Enlaces a GitHub y Demo
- * - Badge de "Destacado" si aplica
- * 
- * Incluye animaciones de entrada y hover effects.
+ * Tarjeta de proyecto. El Link de portada es una capa absoluta: así toda la
+ * tarjeta es clicable sin anidar <a> dentro de <a> (HTML inválido).
  */
 export default function ProjectCard({ project, index = 0 }: ProjectCardProps) {
   return (
-    <Link href={`/projects/${project.id}`}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: index * 0.1 }}
-        className="group relative bg-secondary rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl cursor-pointer"
-      >
-      {/* Image */}
-      <div className="relative h-48 sm:h-56 overflow-hidden bg-muted">
-        <Image
-          src={project.image}
-          alt={project.title}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-        {/* Overlay gradient en hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </div>
+    <motion.article
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="group relative bg-secondary rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl"
+    >
+      <Link
+        href={`/projects/${project.id}`}
+        aria-label={`Ver detalles de ${project.title}`}
+        className="absolute inset-0 z-10 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+      />
 
-      {/* Content */}
+      <ProjectVisual
+        project={project}
+        className="relative h-48 sm:h-56"
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      />
+
       <div className="p-6">
-        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-          {project.title}
-        </h3>
-        
-        <p className="text-muted-foreground mb-4 line-clamp-2">
+        <div className="mb-2 flex items-center gap-2">
+          <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
+            {project.title}
+          </h3>
+          {project.confidential && (
+            <span className="rounded-full bg-foreground/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Trabajo
+            </span>
+          )}
+        </div>
+
+        <p className="mb-4 line-clamp-2 text-muted-foreground">
           {project.description}
         </p>
 
-        {/* Tags - Muestra máximo 4 */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="mb-4 flex flex-wrap gap-2">
           {project.tags.slice(0, 4).map((tag) => (
             <span
               key={tag}
-              className="px-3 py-1 text-xs font-medium bg-accent text-accent-foreground rounded-full"
+              className="rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground"
             >
               {tag}
             </span>
@@ -73,8 +68,8 @@ export default function ProjectCard({ project, index = 0 }: ProjectCardProps) {
           )}
         </div>
 
-        {/* Links */}
-        <div className="flex gap-3">
+        {/* z-20 para quedar por encima del Link que cubre la tarjeta */}
+        <div className="relative z-20 flex gap-4">
           {project.github && (
             <a
               href={project.github}
@@ -82,7 +77,7 @@ export default function ProjectCard({ project, index = 0 }: ProjectCardProps) {
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
             >
-              <Github size={18} />
+              <Github size={18} aria-hidden="true" />
               Código
             </a>
           )}
@@ -93,20 +88,23 @@ export default function ProjectCard({ project, index = 0 }: ProjectCardProps) {
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors"
             >
-              <ExternalLink size={18} />
+              <ExternalLink size={18} aria-hidden="true" />
               Demo
             </a>
+          )}
+          {!project.github && !project.demo && (
+            <span className="text-sm text-muted-foreground">
+              {project.year}
+            </span>
           )}
         </div>
       </div>
 
-      {/* Featured Badge */}
       {project.featured && (
-        <div className="absolute top-4 right-4 px-3 py-1 bg-primary text-primary-foreground text-xs font-bold rounded-full">
+        <span className="pointer-events-none absolute right-4 top-4 z-20 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
           Destacado
-        </div>
+        </span>
       )}
-    </motion.div>
-    </Link>
+    </motion.article>
   );
 }

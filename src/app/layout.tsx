@@ -1,61 +1,68 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { personalInfo, socialLinks } from '@/data/personal';
+import {
+  GITHUB_URL,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+  TWITTER_HANDLE,
+} from '@/lib/site';
 import './globals.css';
 
-// Configuración de la fuente Inter
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
-/**
- * Metadatos SEO del sitio.
- * 
- * IMPORTANTE: Personaliza estos metadatos con tu información:
- * - title: Título que aparece en la pestaña del navegador
- * - description: Descripción para motores de búsqueda
- * - keywords: Palabras clave para SEO
- * - authors: Tu nombre
- * - openGraph: Para compartir en redes sociales
- */
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Hans Ordoñez | Desarrollador Full Stack',
-    template: '%s | Hans Ordoñez',
+    default: `${SITE_NAME} | ${personalInfo.role}`,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    'Desarrollador Full Stack especializado en React, Next.js y TypeScript. Creando experiencias web excepcionales con soluciones elegantes.',
+  description: SITE_DESCRIPTION,
   keywords: [
     'desarrollador',
+    'full stack',
     'portfolio',
     'react',
     'nextjs',
     'typescript',
-    'fullstack',
-    'Hans Ordoñez',
-    'desarrollador web',
+    'laravel',
+    'rust',
+    SITE_NAME,
     'Junín',
     'Perú',
   ],
-  authors: [{ name: 'Hans Ordoñez', url: 'https://github.com/hanserlodev' }],
-  creator: 'Hans Ordoñez',
-  publisher: 'Hans Ordoñez',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://tu-portfolio.vercel.app'),
+  authors: [{ name: SITE_NAME, url: GITHUB_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     locale: 'es_ES',
     url: '/',
-    title: 'Hans Ordoñez | Desarrollador Full Stack',
-    description:
-      'Desarrollador Full Stack especializado en React, Next.js y TypeScript. Creando experiencias web excepcionales.',
-    siteName: 'Portfolio Hans Ordoñez',
+    title: `${SITE_NAME} | ${personalInfo.role}`,
+    description: SITE_DESCRIPTION,
+    siteName: `${SITE_NAME} · Portafolio`,
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: `${SITE_NAME} | ${personalInfo.role}`,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Hans Ordoñez | Desarrollador Full Stack',
-    description:
-      'Desarrollador Full Stack especializado en React, Next.js y TypeScript.',
-    creator: '@tuusuario',
+    title: `${SITE_NAME} | ${personalInfo.role}`,
+    description: SITE_DESCRIPTION,
+    creator: TWITTER_HANDLE,
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,
@@ -76,33 +83,41 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
 };
 
-/**
- * Configuración de viewport separada (Next.js 15+ requirement)
- */
+/** Next.js 15+ requiere el viewport exportado por separado. */
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
 };
 
-/**
- * Layout raíz de la aplicación.
- * 
- * Este componente envuelve todas las páginas y proporciona:
- * - Configuración de fuentes
- * - ThemeProvider para modo oscuro/claro
- * - Navbar persistente
- * - Footer persistente
- * - Estructura HTML base
- */
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE_NAME,
+  url: SITE_URL,
+  email: `mailto:${personalInfo.email}`,
+  jobTitle: personalInfo.role,
+  description: SITE_DESCRIPTION,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Junín',
+    addressCountry: 'PE',
+  },
+  sameAs: socialLinks.map((link) => link.url),
+  knowsAbout: ['Next.js', 'TypeScript', 'React', 'Laravel', 'PostgreSQL', 'Rust'],
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <Script
+          id="person-jsonld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+          }}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -110,7 +125,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Navbar />
-          <main className="min-h-screen">{children}</main>
+          <ErrorBoundary>
+            <main className="min-h-screen">{children}</main>
+          </ErrorBoundary>
           <Footer />
         </ThemeProvider>
       </body>

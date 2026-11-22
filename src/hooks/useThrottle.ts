@@ -1,31 +1,22 @@
-/**
- * Hook personalizado para throttle de funciones.
- * Limita la frecuencia de ejecución de una función.
- * 
- * @param callback - Función a throttle
- * @param delay - Tiempo mínimo entre ejecuciones en ms
- * @returns Función throttled
- * 
- * @example
- * const throttledScroll = useThrottle(handleScroll, 100);
- */
 import { useCallback, useRef } from 'react';
 
-export function useThrottle<T extends (...args: any[]) => any>(
-  callback: T,
-  delay: number = 100
-): T {
-  const lastRan = useRef(Date.now());
+/**
+ * Limita la frecuencia de ejecución de un callback a una vez cada `delay` ms.
+ */
+export function useThrottle<Args extends unknown[]>(
+  callback: (...args: Args) => void,
+  delay = 100
+): (...args: Args) => void {
+  const lastRan = useRef(0);
 
   return useCallback(
-    ((...args) => {
+    (...args: Args) => {
       const now = Date.now();
-      
       if (now - lastRan.current >= delay) {
         callback(...args);
         lastRan.current = now;
       }
-    }) as T,
+    },
     [callback, delay]
   );
 }

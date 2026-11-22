@@ -21,9 +21,9 @@
 **Archivos modificados:**
 - [src/app/contact/page.tsx](src/app/contact/page.tsx)
   - Integración completa con EmailJS usando variables de entorno
-  - Fallback a simulación si no hay credenciales
+  - Aviso explícito si no hay credenciales (ya no simula envíos exitosos)
   - Manejo de errores mejorado con tipos específicos
-  - Cleanup correcto de timeouts para evitar memory leaks
+  - Cleanup de timeouts gestionado con `useEffect` para evitar memory leaks
 
 #### 4. ✅ Datos Personales
 **Verificado:**
@@ -61,7 +61,6 @@
 
 #### 7. ✅ Optimización de Performance
 **Archivos creados:**
-- [src/hooks/useDebounce.ts](src/hooks/useDebounce.ts) - Hook para debounce
 - [src/hooks/useThrottle.ts](src/hooks/useThrottle.ts) - Hook para throttle
 
 **Archivos modificados:**
@@ -144,8 +143,8 @@ src/app/projects/loading.tsx
 src/app/projects/[id]/page.tsx
 src/app/projects/[id]/loading.tsx
 src/components/ErrorBoundary.tsx
-src/hooks/useDebounce.ts
 src/hooks/useThrottle.ts
+src/lib/site.ts
 src/lib/icons.ts
 tsconfig.strict.json
 ```

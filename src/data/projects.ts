@@ -1,135 +1,211 @@
 /**
- * Interfaz para definir la estructura de un proyecto.
- * 
- * @property id - Identificador único del proyecto
- * @property title - Nombre del proyecto
- * @property description - Descripción breve (se muestra en las tarjetas)
- * @property longDescription - Descripción extendida (opcional, para página de detalle)
- * @property image - URL de la imagen del proyecto
- * @property tags - Array de tecnologías utilizadas
- * @property github - URL del repositorio en GitHub (opcional)
- * @property demo - URL de la demo en vivo (opcional)
- * @property featured - Si es true, aparecerá en la página de inicio
+ * Proyectos reales del portafolio.
+ *
+ * `github` se omite en proyectos de trabajo privados (`confidential: true`):
+ * solo se muestra su demo pública, nunca el repositorio.
+ * `image` es opcional; si no hay captura, ProjectVisual dibuja un placeholder
+ * con la paleta indicada en `tone`.
  */
+export type ProjectTone =
+  | 'ember'
+  | 'violet'
+  | 'indigo'
+  | 'amber'
+  | 'rose'
+  | 'slate'
+  | 'emerald'
+  | 'cyan'
+  | 'sky'
+  | 'fuchsia';
+
 export interface Project {
   id: string;
   title: string;
   description: string;
   longDescription?: string;
-  image: string;
+  image?: string;
+  tone: ProjectTone;
   tags: string[];
   github?: string;
   demo?: string;
   featured?: boolean;
+  confidential?: boolean;
+  year: string;
+  updatedAt: string;
 }
 
-/**
- * 🚀 EDITA TUS PROYECTOS AQUÍ
- * 
- * Este es el array principal de proyectos que se mostrará en tu portafolio.
- * 
- * INSTRUCCIONES:
- * 1. Copia la estructura de un proyecto existente
- * 2. Cambia el 'id' (debe ser único)
- * 3. Actualiza todos los campos con tu información
- * 4. Las imágenes pueden ser:
- *    - URLs de Unsplash (como en los ejemplos)
- *    - URLs de tu propio hosting
- *    - Rutas locales (ej: '/images/proyecto1.jpg')
- * 5. Marca 'featured: true' para destacar el proyecto en la página principal
- * 
- * TIPS:
- * - Los proyectos con 'featured: true' aparecen en la página de inicio
- * - Usa tags relevantes para filtrado futuro
- * - Las descripciones cortas se ven mejor entre 100-150 caracteres
- */
+const GITHUB = 'https://github.com/hanserlodev';
+
 export const projects: Project[] = [
   {
-    id: '1',
-    title: 'E-Commerce Platform',
+    id: 'ninacal',
+    title: 'NinaCal',
     description:
-      'Plataforma de comercio electrónico completa con carrito de compras, pagos y panel de administración.',
+      'Calendario de actividad de incendios a 23 años para cualquier país o área dibujada, construido para el NASA Space Apps Challenge 2026.',
     longDescription:
-      'Una solución e-commerce completa construida con Next.js, Stripe para pagos y un panel de administración robusto. Incluye gestión de inventario, órdenes y análisis en tiempo real.',
-    image: 'https://images.unsplash.com/photo-1557821552-17105176677c?w=800&q=80',
-    tags: ['Next.js', 'TypeScript', 'Stripe', 'PostgreSQL', 'Prisma'],
-    github: 'https://github.com/tuusuario/ecommerce',
-    demo: 'https://tuproyecto.vercel.app',
+      'Armoniza los puntos calientes detectados por MODIS (Aqua) y VIIRS (Suomi-NPP/NOAA-20) en una sola escala de días, con 153 países publicados y 57 millones de celdas mensuales. Expone un calendario año × mes con clasificación Normal / Elevado / Crítico, comparación contra la mediana histórica, exportación de datos y enlaces compartibles de la vista exacta.',
+    image: '/images/projects/ninacal.png',
+    tone: 'ember',
+    tags: ['Next.js', 'TypeScript', 'NASA FIRMS', 'Datos geoespaciales'],
+    github: `${GITHUB}/ninacal`,
+    demo: 'https://ninacal.vercel.app',
     featured: true,
+    year: '2026',
+    updatedAt: '2026-11-21',
   },
   {
-    id: '2',
-    title: 'Task Management App',
+    id: 'mercado-modelo',
+    title: 'Mercado Modelo · Gestión integral',
     description:
-      'Aplicación de gestión de tareas con drag & drop, colaboración en tiempo real y notificaciones.',
+      'Sistema financiero, administrativo y operativo para el Mercado Modelo: socios, puestos, pagos, deudas, contabilidad y constancias PDF.',
     longDescription:
-      'Una aplicación moderna de gestión de proyectos con funcionalidades de colaboración en tiempo real, tableros Kanban, y sistema de notificaciones.',
-    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80',
-    tags: ['React', 'Firebase', 'TailwindCSS', 'DnD Kit'],
-    github: 'https://github.com/tuusuario/task-manager',
-    demo: 'https://task-manager-demo.vercel.app',
+      'Plataforma de gestión con roles (ADMIN, TESORERÍA, OPERADOR, SECRETARÍA, PRESIDENTE), validación de pagos, vencimientos automáticos de deudas, control de SSHH y ambulants, y generación de constancias. Desplegada en VPS propio con PM2. Proyecto de trabajo con repositorio privado.',
+    tone: 'emerald',
+    tags: ['Next.js', 'TypeScript', 'Supabase', 'PostgreSQL', 'shadcn/ui'],
+    demo: 'https://mercado-modelo-jade.vercel.app',
     featured: true,
+    confidential: true,
+    year: '2026',
+    updatedAt: '2026-11-21',
   },
   {
-    id: '3',
-    title: 'Weather Dashboard',
+    id: 'gabriela-mistral',
+    title: 'IEP Gabriela Mistral',
     description:
-      'Dashboard del clima con pronósticos detallados, mapas interactivos y alertas personalizadas.',
+      'Landing institucional de 10 páginas para una institución educativa privada en Huancayo, con blog, galería y panel administrativo.',
     longDescription:
-      'Una aplicación del clima completa que muestra pronósticos detallados, mapas meteorológicos interactivos, y permite configurar alertas personalizadas.',
-    image: 'https://images.unsplash.com/photo-1592210454359-9043f067919b?w=800&q=80',
-    tags: ['Next.js', 'OpenWeather API', 'Mapbox', 'Chart.js'],
-    github: 'https://github.com/tuusuario/weather-app',
-    demo: 'https://weather-demo.vercel.app',
-    featured: false,
-  },
-  {
-    id: '4',
-    title: 'Social Media Analytics',
-    description:
-      'Herramienta de análisis para redes sociales con métricas en tiempo real y reportes automáticos.',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
-    tags: ['React', 'Node.js', 'MongoDB', 'D3.js'],
-    github: 'https://github.com/tuusuario/social-analytics',
-    featured: false,
-  },
-  {
-    id: '5',
-    title: 'Portfolio CMS',
-    description:
-      'Sistema de gestión de contenido personalizado para portafolios creativos con editor visual.',
-    image: 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=800&q=80',
-    tags: ['Next.js', 'Sanity.io', 'TypeScript', 'TailwindCSS'],
-    github: 'https://github.com/tuusuario/portfolio-cms',
-    demo: 'https://portfolio-cms-demo.vercel.app',
-    featured: false,
-  },
-  {
-    id: '6',
-    title: 'AI Content Generator',
-    description:
-      'Generador de contenido basado en IA para marketing, blogs y redes sociales.',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',
-    tags: ['Next.js', 'OpenAI', 'Prisma', 'PostgreSQL'],
-    github: 'https://github.com/tuusuario/ai-content-gen',
+      'Sitio institucional con autenticación por roles (admin/profesor), chatbot conectado a Google Sheets, blog dinámico filtrable, galería fotográfica, formulario de contacto persistido en Supabase y middleware de seguridad en rutas protegidas. Proyecto de trabajo con repositorio privado.',
+    tone: 'sky',
+    tags: ['Next.js', 'Supabase', 'NextAuth', 'Google Sheets API'],
+    demo: 'https://gmschool.pe/',
     featured: true,
+    confidential: true,
+    year: '2026',
+    updatedAt: '2026-11-21',
+  },
+  {
+    id: 'voronia',
+    title: 'Voronia',
+    description:
+      'Motor nativo en Rust + wgpu para generar y editar mundos de fantasía, con importación bit-exacta de mapas de Azgaar.',
+    longDescription:
+      'Reimplementación desde cero del pipeline procedural de Azgaar: regeneración determinista de la geometría (grid + Voronoi + repacking), parser del formato .map, capas de render en GPU (biomas, relieve, ríos, estados, burgos, etiquetas) y formato nativo .vorn con autoguardado. Incluye hidrología y Paridad de Geografía Humana; objetivo de 100k celdas a 60 FPS.',
+    image: '/images/projects/voronia.png',
+    tone: 'violet',
+    tags: ['Rust', 'wgpu', 'egui', 'Procedural generation'],
+    github: `${GITHUB}/voronia`,
+    featured: true,
+    year: '2026',
+    updatedAt: '2026-11-21',
+  },
+  {
+    id: 'debateia',
+    title: 'DebateIA',
+    description:
+      'Plataforma para practicar debates estructurados contra una IA adaptativa, con evaluación, estadísticas y modo voz.',
+    longDescription:
+      'Debates con sets y turnos configurables, posturas a favor/en contra/aleatorias, puntuación 0-100, historial con resúmenes, gráficos de evolución, más de 100 temas visuales y síntesis y reconocimiento de voz. Proyecto de trabajo con repositorio privado.',
+    image: '/images/projects/DebateIA.png',
+    tone: 'fuchsia',
+    tags: ['Next.js', 'TypeScript', 'Gemini API', 'Web Speech API'],
+    demo: 'https://debate-ia-sigma.vercel.app',
+    confidential: true,
+    year: '2026',
+    updatedAt: '2026-11-21',
+  },
+  {
+    id: 'filam-centroplas',
+    title: 'Filam CentroPlas',
+    description:
+      'E-commerce corporativo para FILAM S.A.: catálogo industrial, solicitudes de compra, panel administrativo y cumplimiento legal peruano.',
+    longDescription:
+      'Plataforma B2B para productos plásticos, láminas y suministros industriales. Incluye RBAC con Fortify y Policies, colas y caché con Redis/Valkey + Horizon, generación de PDF con DomPDF y cumplimiento de la Ley 29733 y Ley 29571. Calidad con Pint, PHPStan/Larastan y 56 pruebas PHPUnit. Proyecto de trabajo con repositorio privado.',
+    tone: 'cyan',
+    tags: ['Laravel 13', 'Livewire 4', 'PostgreSQL', 'Tailwind 4', 'PHPUnit'],
+    confidential: true,
+    year: '2026',
+    updatedAt: '2026-11-21',
+  },
+  {
+    id: 'kanadojo',
+    title: 'KanaDojo',
+    description:
+      'Plataforma minimalista y estética para aprender y practicar japonés, inspirada en Monkeytype y traducida por la comunidad.',
+    longDescription:
+      'Entrenamiento de hiragana, katakana y vocabulario con una interfaz limpia y personalizable, soporte para nueve idiomas gracias a contribuciones de la comunidad y documentación abierta.',
+    image: '/images/projects/kanadojo.png',
+    tone: 'indigo',
+    tags: ['TypeScript', 'React', 'i18n', 'Open source'],
+    github: `${GITHUB}/kanadojo`,
+    demo: 'https://kanadojo.com',
+    year: '2026',
+    updatedAt: '2026-11-21',
+  },
+  {
+    id: 'agusto-market',
+    title: 'A Gusto Market',
+    description:
+      'Demo frontend de una plataforma regional de snacks con carrito, pedidos por WhatsApp y panel administrativo tipo SaaS.',
+    longDescription:
+      'Cliente PWA instalable con carrito por Context API, confirmación de pedidos mediante QR + WhatsApp y datos mock completos. El panel administrativo añade dashboard con métricas, CRUD de productos e inventario, gestión de pedidos, promociones, base de clientes y reportes.',
+    image: '/images/projects/agusto-market.png',
+    tone: 'amber',
+    tags: ['Next.js', 'TypeScript', 'TailwindCSS', 'PWA'],
+    github: `${GITHUB}/agusto-market`,
+    demo: 'https://agusto-market.vercel.app',
+    year: '2026',
+    updatedAt: '2026-11-21',
+  },
+  {
+    id: 'registro-clash-royale',
+    title: 'Registro Clash Royale',
+    description:
+      'Sistema de inscripción para un torneo universitario de Clash Royale con 8 grupos de 8 participantes y validación en Supabase.',
+    longDescription:
+      'Formulario de registro con validación de código de estudiante, correo y grupo; persistencia en PostgreSQL mediante Supabase y restricciones de integridad para garantizar el límite de 64 participantes.',
+    image: '/images/projects/registro-clash-royale.png',
+    tone: 'rose',
+    tags: ['Next.js', 'TypeScript', 'Supabase', 'PostgreSQL'],
+    github: `${GITHUB}/registro-clash-royale`,
+    demo: 'https://registro-clash-royale.vercel.app',
+    year: '2026',
+    updatedAt: '2026-11-21',
+  },
+  {
+    id: 'your-free-downloader',
+    title: 'YourFreeDownloader',
+    description:
+      'Descargador de videos multiplataforma, de escritorio y Android, pensado como alternativa libre a apps con publicidad invasiva.',
+    longDescription:
+      'Cliente de escritorio en Python 3.11 + CustomTkinter + yt-dlp para Windows y Linux, y cliente Android en Kotlin + Jetpack Compose con Chaquopy para ejecutar el backend Python.',
+    image: '/images/projects/YourFreeDownloader.png',
+    tone: 'slate',
+    tags: ['Python', 'Kotlin', 'Jetpack Compose', 'yt-dlp'],
+    github: `${GITHUB}/YourFreeDownloader`,
+    year: '2025',
+    updatedAt: '2026-11-21',
+  },
+  {
+    id: 'debateia-android',
+    title: 'DebateIA Android',
+    description:
+      'Aplicación Android para practicar debates con Gemini: misma experiencia de DebateIA en formato nativo móvil.',
+    tone: 'fuchsia',
+    tags: ['Kotlin', 'Android', 'Gemini API'],
+    confidential: true,
+    year: '2026',
+    updatedAt: '2026-11-21',
   },
 ];
 
-/**
- * Retorna solo los proyectos marcados como destacados.
- * Útil para mostrar en la página de inicio.
- */
-export const getFeaturedProjects = (): Project[] => {
-  return projects.filter((project) => project.featured);
-};
+/** Proyectos destacados, en el orden definido arriba. */
+export const getFeaturedProjects = (): Project[] =>
+  projects.filter((project) => project.featured);
 
-/**
- * Busca y retorna un proyecto por su ID.
- * Retorna undefined si no se encuentra.
- * 
- * @param id - ID único del proyecto a buscar
- */
-export const getProjectById = (id: string): Project | undefined => {
-  return projects.find((project) => project.id === id);
-};
+/** Busca un proyecto por su slug. */
+export const getProjectById = (id: string): Project | undefined =>
+  projects.find((project) => project.id === id);
+
+/** Todas las tecnologías distintas usadas en el portafolio. */
+export const getAllTags = (): string[] =>
+  Array.from(new Set(projects.flatMap((project) => project.tags)));

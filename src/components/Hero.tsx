@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, Download } from 'lucide-react';
 import { personalInfo } from '@/data/personal';
+import Avatar from './Avatar';
 import SocialLinks from './SocialLinks';
 
 /**
@@ -21,7 +22,7 @@ import SocialLinks from './SocialLinks';
  */
 export default function Hero() {
   return (
-    <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
+    <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16 overflow-hidden">
       <div className="max-w-7xl mx-auto w-full">
         <div className="text-center">
           {/* Avatar con gradiente animado */}
@@ -31,11 +32,7 @@ export default function Hero() {
             transition={{ duration: 0.5 }}
             className="mb-8"
           >
-            <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-pink-500 p-1">
-              <div className="w-full h-full rounded-full bg-background flex items-center justify-center text-4xl font-bold">
-                {personalInfo.name.charAt(0)}
-              </div>
-            </div>
+            <Avatar size={120} className="mx-auto" />
           </motion.div>
 
           {/* Texto principal */}

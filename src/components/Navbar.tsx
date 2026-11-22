@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 import { useThrottle } from '@/hooks/useThrottle';
+import { SITE_NAME } from '@/lib/site';
 
 /**
  * Elementos de navegación principal.
@@ -34,16 +35,29 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
-  // Throttle del handler de scroll para mejor performance
-  const handleScroll = useThrottle(() => {
+  const onScroll = useCallback(() => {
     setIsScrolled(window.scrollY > 10);
-  }, 100);
+  }, []);
 
-  // Detecta el scroll para aplicar efectos visuales
+  const handleScroll = useThrottle(onScroll, 100);
+
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
+
+  // El menú se cierra al pulsar Escape; los enlaces móviles lo cierran al navegar.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen]);
+
+  const isActive = (href: string) =>
+    href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <nav
@@ -61,7 +75,7 @@ export default function Navbar() {
             href="/"
             className="text-xl font-bold gradient-text hover:opacity-80 transition-opacity"
           >
-            Portfolio
+            {SITE_NAME}
           </Link>
 
           {/* Desktop Navigation */}
@@ -72,7 +86,7 @@ export default function Navbar() {
                 href={item.href}
                 className={cn(
                   'text-sm font-medium transition-colors hover:text-primary',
-                  pathname === item.href
+                  isActive(item.href)
                     ? 'text-primary'
                     : 'text-muted-foreground'
                 )}
@@ -89,7 +103,9 @@ export default function Navbar() {
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-md text-foreground hover:bg-accent transition-colors"
-              aria-label="Toggle menu"
+              aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
+              aria-expanded={isOpen}
+              aria-controls="mobile-navigation"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -99,7 +115,7 @@ export default function Navbar() {
 
       {/* Mobile Navigation */}
       {isOpen && (
-        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
+        <div id="mobile-navigation" className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navItems.map((item) => (
               <Link
@@ -108,7 +124,7 @@ export default function Navbar() {
                 onClick={() => setIsOpen(false)}
                 className={cn(
                   'block px-3 py-2 rounded-md text-base font-medium transition-colors',
-                  pathname === item.href
+                  isActive(item.href)
                     ? 'bg-accent text-primary'
                     : 'text-muted-foreground hover:bg-accent hover:text-primary'
                 )}

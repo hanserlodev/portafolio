@@ -1,10 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import SectionTitle from '@/components/SectionTitle';
 import { personalInfo, aboutMe, skills } from '@/data/personal';
 import { MapPin, Mail, Download } from 'lucide-react';
+import Avatar from '@/components/Avatar';
 
 export default function AboutPage() {
     const skillsByCategory = {
@@ -30,10 +30,8 @@ export default function AboutPage() {
                     {/* Avatar */}
                     <div className="md:col-span-1">
                         <div className="sticky top-24">
-                            <div className="w-full aspect-square rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-1 mb-6">
-                                <div className="w-full h-full rounded-2xl bg-background flex items-center justify-center text-6xl font-bold">
-                                    {personalInfo.name.charAt(0)}
-                                </div>
+                            <div className="mb-6 flex justify-center md:justify-start">
+                                <Avatar size={280} className="max-w-full" />
                             </div>
 
                             <div className="space-y-3">
